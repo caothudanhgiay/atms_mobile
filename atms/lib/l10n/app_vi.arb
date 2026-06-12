@@ -1,0 +1,19 @@
+{
+  "@@locale": "vi",
+  "app_name": "Atms",
+  "no_internet": "Không có internet, vui lòng kiểm tra lại.",
+  "@no_internet": {
+    "description": "No internet"
+  },
+  "camera_request_title": "Cần quyền camera.",
+  "camera_request_content": "Ứng dụng cần quyền camera để quét mã. Hãy cấp quyền trong phần Cài đặt.",
+  "btn_cancel": "Hủy",
+  "btn_open_setting": "Mở cài đặt",
+  "btn_delete": "Xóa",
+  "btn_ok": "Đồng ý",
+  "let_say": "Bạn nói đi...",
+  "i_am_listening": "Mình đang lắng nghe…",
+  "speak_or_type": "Nói hoặc nhập nội dung",
+  "hint_content": "Nội dung..."
+
+}

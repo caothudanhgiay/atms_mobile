@@ -1,0 +1,57 @@
+name: loadweb
+description: A new Flutter project.
+
+publish_to: 'none'
+
+version: 1.1.5+3
+
+environment:
+  sdk: ">=2.18.0 <=4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  path_provider: ^2.1.4
+  dio: ^5.7.0
+  permission_handler: ^11.3.1
+  http: ^1.2.2
+  webview_flutter: ^4.13.1
+  file_picker: ^8.1.2
+  image_picker: ^1.2.0
+  open_file: ^3.5.10
+  device_info_plus: ^9.1.2
+  get_it: ^8.0.2
+  app_tracking_transparency: ^2.0.6
+  mobile_scanner: ^7.0.1
+  geolocator: ^14.0.2
+  app_settings: ^6.1.1
+  intl: any
+  network_info_plus: ^4.1.0+1
+  connectivity_plus: ^5.0.2
+  shared_preferences: ^2.3.3
+  url_launcher: ^6.3.1
+  speech_to_text: ^7.4.0-beta.6
+  provider: ^6.1.5+1
+  flutter_localizations:
+    sdk: flutter
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^2.0.0
+  flutter_launcher_icons: "^0.10.0"
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/atms-logo-png.png"
+  min_sdk_android: 20 # android min sdk min:16, default 21
+
+flutter:
+  generate: true
+  uses-material-design: true
+  assets:
+    - assets/images/
+

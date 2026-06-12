@@ -1,0 +1,18 @@
+{
+  "@@locale": "en",
+  "app_name": "Atms",
+  "no_internet": "No internet, please check again.",
+  "@no_internet": {
+    "description": "No internet"
+  },
+  "camera_request_title": "Camera permission required.",
+  "camera_request_content": "The app needs camera permission to scan codes. Please grant permission in Settings.",
+  "btn_cancel": "Cancel",
+  "btn_open_setting": "Open Settings",
+  "btn_delete": "Delete",
+  "btn_ok": "OK",
+  "let_say": "Please speak...",
+  "i_am_listening": "I'm listening...",
+  "speak_or_type": "Speak or type",
+  "hint_content": "Content..."
+}

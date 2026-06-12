@@ -1,0 +1,18 @@
+{
+  "@@locale": "ja",
+  "app_name": "Atms",
+  "no_internet": "インターネットがありません。もう一度確認してください。",
+  "@no_internet": {
+    "description": "No internet"
+  },
+  "camera_request_title": "カメラの許可が必要です。",
+  "camera_request_content": "コードをスキャンするためにアプリがカメラの許可を必要としています。設定で許可を付与してください。",
+  "btn_cancel": "キャンセル",
+  "btn_open_setting": "設定を開く",
+  "btn_delete": "消去",
+  "btn_ok": "同意する",
+  "let_say": "話してください。。。",
+  "i_am_listening": "聞いてますよ。。。",
+  "speak_or_type": "話すか入力する",
+  "hint_content": "コンテンツ。。。"
+}
