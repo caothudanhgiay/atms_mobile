@@ -170,11 +170,7 @@ class CustomWebViewState extends State<CustomWebView> with WidgetsBindingObserve
   ///
   /// Return type [void]
   callFunctionJS(String functionName) async {
-    try {
-      await _controller.runJavaScript(functionName);
-    } catch (e, stack) {
-      APIService.writeLogError('callFunctionJS error ($functionName): $e\n$stack');
-    }
+    await _controller.runJavaScript(functionName);
   }
 
   /// Call function js and return data in webview.
@@ -183,36 +179,21 @@ class CustomWebViewState extends State<CustomWebView> with WidgetsBindingObserve
   ///
   /// Return type [void]
   callFunctionJSReturnData(String functionName) async {
-    try {
-      final result = await _controller.runJavaScriptReturningResult(functionName);
-      return result;
-    } catch (e, stack) {
-      APIService.writeLogError('callFunctionJSReturnData error ($functionName): $e\n$stack');
-      return null;
-    }
+    final result = await _controller.runJavaScriptReturningResult(functionName);
+    return result;
   }
 
   /// Send device information into webview.
   ///
   /// Return type [void]
   callFcGetDefaultLan() async {
-    try {
-      var lan = await callFunctionJSReturnData("${Constants.JS_GET_DEFAULT_LAN}()");
-      var lanVoice = await callFunctionJSReturnData("${Constants.JS_GET_DEFAULT_LAN_VOICE}()");
-      
-      if (lan != null && lan.toString().isNotEmpty) {
-        lan = lan.toString().replaceAll('\"', '');
-        CommonUtil.appUpdateLocale(lan as String);
-        await CommonUtil.saveSharedPreferences(Constants.SHARED_LANG, lan);
-      }
-      
-      if (lanVoice != null && lanVoice.toString().isNotEmpty) {
-        lanVoice = lanVoice.toString().replaceAll('\"', '');
-        await CommonUtil.saveSharedPreferences(Constants.SHARED_LANG_VOICE, lanVoice as String);
-      }
-    } catch (e, stack) {
-      APIService.writeLogError('callFcGetDefaultLan error: $e\n$stack');
-    }
+    var lan = await callFunctionJSReturnData("${Constants.JS_GET_DEFAULT_LAN}()");
+    var lanVoice = await callFunctionJSReturnData("${Constants.JS_GET_DEFAULT_LAN_VOICE}()");
+    lan = lan!.replaceAll('\"', '');
+    lanVoice = lanVoice!.replaceAll('\"', '');
+    CommonUtil.appUpdateLocale(lan);
+    await CommonUtil.saveSharedPreferences(Constants.SHARED_LANG, lan);
+    await CommonUtil.saveSharedPreferences(Constants.SHARED_LANG_VOICE, lanVoice);
   }
 
   /// Send device information into webview.
