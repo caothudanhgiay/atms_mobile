@@ -239,9 +239,9 @@ class CustomWebViewState extends State<CustomWebView> with WidgetsBindingObserve
     );
 
     if (barcode != null && barcode.toString().isNotEmpty) {
-      callFunctionJS('${Constants.JS_BAR_CODE_HANDLE}("$barcode")');
+      _controller.runJavaScript('${Constants.JS_BAR_CODE_HANDLE}("$barcode")');
     } else {
-      callFunctionJS('${Constants.JS_BAR_CODE_CANCEL}()');
+      _controller.runJavaScript('${Constants.JS_BAR_CODE_CANCEL}()');
     }
   }
 
@@ -504,7 +504,7 @@ class CustomWebViewState extends State<CustomWebView> with WidgetsBindingObserve
     }
     final safeResult = jsonEncode(result);
 
-    callFunctionJS('${Constants.JS_APP_INFO_HANDLE_VOICE_SEARCH}($safeResult)');
+    _controller.runJavaScript('${Constants.JS_APP_INFO_HANDLE_VOICE_SEARCH}($safeResult)');
   }
 
   /// Open page voice text and return data for js handleVoiceResultTextPage in the webview.
@@ -529,7 +529,7 @@ class CustomWebViewState extends State<CustomWebView> with WidgetsBindingObserve
     }
     final safeResult = jsonEncode(result);
 
-    callFunctionJS('${Constants.JS_APP_INFO_HANDLE_VOICE_TEXT_PAGE}($safeResult)');
+    _controller.runJavaScript('${Constants.JS_APP_INFO_HANDLE_VOICE_TEXT_PAGE}($safeResult)');
   }
 
   /// Map keyboard type to HTML inputmode attribute.
@@ -574,14 +574,14 @@ class CustomWebViewState extends State<CustomWebView> with WidgetsBindingObserve
       })()
     """;
 
-    final result = await callFunctionJSReturnData(jsCode);
+    final result = await _controller.runJavaScriptReturningResult(jsCode);
 
     // Focus WebView widget ở Flutter/native level TRƯỚC
     _webViewFocusNode.requestFocus();
     await Future.delayed(const Duration(milliseconds: 100));
 
     // Gọi handleTypeKeyBoard gốc
-    callFunctionJS(
+    _controller.runJavaScript(
       '${Constants.JS_APP_INFO_HANDLE_TYPE_KEYBOARD}("$idTxtText")',
     );
   }
@@ -603,7 +603,7 @@ class CustomWebViewState extends State<CustomWebView> with WidgetsBindingObserve
     final keyboardCssPx = window.viewInsets.bottom / window.devicePixelRatio;
 
     if (keyboardCssPx > 0) {
-      callFunctionJS(
+      _controller.runJavaScript(
         '${Constants.JS_APP_INFO_HANDLE_KEYBOARD}(${keyboardCssPx.toInt()})',
       );
     }
@@ -617,7 +617,7 @@ class CustomWebViewState extends State<CustomWebView> with WidgetsBindingObserve
     String location = await CommonUtil.getCurrentLocation();
     String data = location + Constants.PIPE + wifi!;
 
-    callFunctionJS('${Constants.JS_APP_INFO_HANDLE}("$data")');
+    _controller.runJavaScript('${Constants.JS_APP_INFO_HANDLE}("$data")');
   }
 
   /// Show the selection between photo library and take a photo.
