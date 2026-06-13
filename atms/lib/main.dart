@@ -91,21 +91,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   initState() {
     super.initState();
-    // Dùng Future để xử lý async trong initState an toàn
-    // Không await trực tiếp vì initState không phải async
-    // Nếu thiếu try-catch, exception trong Release mode sẽ crash app
-    Future(() async {
-      try {
-        await locator<DeviceInfo>().initPlatformState();
-      } catch (e) {
-        debugPrint('initPlatformState error: $e');
-      }
-      try {
-        await locator<NetworkInfoPlus>().getNetworkInfo();
-      } catch (e) {
-        debugPrint('getNetworkInfo error: $e');
-      }
-    });
+    locator<DeviceInfo>().initPlatformState();
+    locator<NetworkInfoPlus>().getNetworkInfo();
   }
 
   /// Create page
