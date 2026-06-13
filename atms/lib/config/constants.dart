@@ -3,7 +3,7 @@ class Constants {
   static const String URL_ATMS = "https://atms.vn/?m=app";
 
   // API
-  static const String URL_API = "http://api.atms.vn:9393/api/logs";
+  static const String URL_API = "https://api.atms.vn:9393/api/logs";
 
   static const String APP_TOKEN = "sf!@#@!#vbc%^";
 

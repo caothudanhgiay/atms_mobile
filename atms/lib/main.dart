@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:loadweb/service/APIService.dart';
+
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -16,37 +18,73 @@ import 'model/locale_provider.dart';
 
 /// Main function
 main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  setupLocator();
+  // Bắt lỗi toàn cục của Dart
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    setupLocator();
 
-  await requestPermissionAppTracking();
-  await requestPermission();
+    try {
+      await requestPermissionAppTracking();
+    } catch (e, stack) {
+      APIService.writeLogError("requestPermissionAppTracking crash: $e\n$stack");
+    }
 
-  // Allow (Portrait)
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
+    try {
+      await requestPermission();
+    } catch (e, stack) {
+      APIService.writeLogError("requestPermission crash: $e\n$stack");
+    }
 
-  runApp(
-    ChangeNotifierProvider(
-      create: (_) => locator<LocaleProvider>(), // auto change locale
-      child: const MyApp(),
-    ),
-  );
+    // Allow (Portrait)
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+
+    // Bắt lỗi toàn cục của Flutter
+    FlutterError.onError = (FlutterErrorDetails details) {
+      FlutterError.presentError(details);
+      APIService.writeLogError("FlutterError: ${details.exception}\n${details.stack}");
+    };
+
+    runApp(
+      ChangeNotifierProvider(
+        create: (_) => locator<LocaleProvider>(), // auto change locale
+        child: const MyApp(),
+      ),
+    );
+  }, (error, stack) {
+    APIService.writeLogError("runZonedGuarded Uncaught Error: $error\n$stack");
+  });
 }
 
 /// Access permission
 requestPermission() async {
-  await [
-    Permission.storage,
-    Permission.camera,
-    Permission.photos,
-    Permission.location,
-    Permission.locationAlways,
-    Permission.locationWhenInUse,
-    Permission.accessMediaLocation,
-  ].request();
+  try {
+    if (Platform.isIOS) {
+      await [
+        Permission.camera,
+        Permission.photos,
+        Permission.location,
+        Permission.locationWhenInUse,
+        Permission.microphone,
+        Permission.speech,
+      ].request();
+    } else {
+      await [
+        Permission.storage,
+        Permission.camera,
+        Permission.photos,
+        Permission.location,
+        Permission.locationAlways,
+        Permission.locationWhenInUse,
+        Permission.accessMediaLocation,
+        Permission.microphone,
+      ].request();
+    }
+  } catch (e, stack) {
+    APIService.writeLogError('requestPermission request crash: $e\n$stack');
+  }
 }
 
 /// Request permission app tracking.
@@ -97,12 +135,14 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     Future(() async {
       try {
         await locator<DeviceInfo>().initPlatformState();
-      } catch (e) {
+      } catch (e, stack) {
+        APIService.writeLogError('initPlatformState crash: $e\n$stack');
         debugPrint('initPlatformState error: $e');
       }
       try {
         await locator<NetworkInfoPlus>().getNetworkInfo();
-      } catch (e) {
+      } catch (e, stack) {
+        APIService.writeLogError('getNetworkInfo crash: $e\n$stack');
         debugPrint('getNetworkInfo error: $e');
       }
     });
