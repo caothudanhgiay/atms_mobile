@@ -129,8 +129,8 @@ class CustomWebViewState extends State<CustomWebView> with WidgetsBindingObserve
     timer = Timer.periodic(const Duration(seconds: 3), (timer) async {
       try {
         await locator<NetworkInfoPlus>().getNetworkInfo();
-      } catch (e, stack) {
-        APIService.writeLogError('timerUpdateNetworkInfo crash: $e\n$stack');
+      } catch (e) {
+        // bỏ qua lỗi network info — không để crash app
       }
     });
   }
@@ -540,28 +540,20 @@ class CustomWebViewState extends State<CustomWebView> with WidgetsBindingObserve
     String idTxtText = data['idTxtText'];
     String inputMode = _mapInputMode(type);
 
-    // JavaScript to set inputmode and return status/errors
-    String jsCode = """
-      (function() {
-        try {
-          var element = findControlById('$idTxtText');
-          if (!element) return "Error: Element '$idTxtText' not found in masterFrame";
-          
-          element.setAttribute("inputmode", "$inputMode");
-          return "Success: set inputmode to " + "$inputMode" + " for " + "$idTxtText";
-        } catch (e) {
-          return "JS Error: " + e.message;
-        }
-      })()
-    """;
-
-    final result = await _controller.runJavaScriptReturningResult(jsCode);
+    // Flutter set inputmode trên element trong iframe
+    // (đây là code Dart trong custom_webview.dart, KHÔNG sửa file JS)
+    // inputmode quyết định loại keyboard OS hiển thị khi element được focus
+    _controller.runJavaScript(
+      'try{document.getElementById("masterFrame").contentWindow.document.getElementById("$idTxtText").setAttribute("inputmode","$inputMode")}catch(e){}'
+    );
 
     // Focus WebView widget ở Flutter/native level TRƯỚC
+    // Điều này cho Android biết WebView đang active → cho phép keyboard hiện
+    // Trên iOS, WKWebViewKeyboardHelper đã xử lý
     _webViewFocusNode.requestFocus();
     await Future.delayed(const Duration(milliseconds: 100));
 
-    // Gọi handleTypeKeyBoard gốc
+    // Gọi handleTypeKeyBoard gốc — JS chỉ focus element, không sửa gì
     _controller.runJavaScript(
       '${Constants.JS_APP_INFO_HANDLE_TYPE_KEYBOARD}("$idTxtText")',
     );
