@@ -11,13 +11,11 @@ class NetworkInfoPlus {
   ///
   /// Return type[Future<void>]
   Future<void> getNetworkInfo() async {
-    wifiName = await networkInfo.getWifiName();
-    // wifiBSSID = await networkInfo.getWifiBSSID();
-    // wifiIPv4 = await networkInfo.getWifiIP();
-    // wifiIPv6 = await networkInfo.getWifiIPv6();
-    // wifiSubmask = await networkInfo.getWifiSubmask();
-    // wifiBroadcast = await networkInfo.getWifiBroadcast();
-    // wifiGatewayIP = await networkInfo.getWifiGatewayIP();
+    try {
+      wifiName = await networkInfo.getWifiName();
+    } catch (e) {
+      wifiName = null;
+    }
   }
 
   /// Get network information

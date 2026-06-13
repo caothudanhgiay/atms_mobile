@@ -127,7 +127,11 @@ class CustomWebViewState extends State<CustomWebView> with WidgetsBindingObserve
   /// Return type [void]
   void timerUpdateNetworkInfo() {
     timer = Timer.periodic(const Duration(seconds: 3), (timer) async {
-      locator<NetworkInfoPlus>().getNetworkInfo();
+      try {
+        await locator<NetworkInfoPlus>().getNetworkInfo();
+      } catch (e) {
+        // bỏ qua lỗi network info — không để crash app
+      }
     });
   }
 
