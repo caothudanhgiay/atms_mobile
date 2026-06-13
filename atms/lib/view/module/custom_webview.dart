@@ -170,7 +170,11 @@ class CustomWebViewState extends State<CustomWebView> with WidgetsBindingObserve
   ///
   /// Return type [void]
   callFunctionJS(String functionName) async {
-    await _controller.runJavaScript(functionName);
+    try {
+      await _controller.runJavaScript(functionName);
+    } catch (e, stack) {
+      APIService.writeLogError('callFunctionJS error ($functionName): $e\n$stack');
+    }
   }
 
   /// Call function js and return data in webview.
@@ -179,21 +183,36 @@ class CustomWebViewState extends State<CustomWebView> with WidgetsBindingObserve
   ///
   /// Return type [void]
   callFunctionJSReturnData(String functionName) async {
-    final result = await _controller.runJavaScriptReturningResult(functionName);
-    return result;
+    try {
+      final result = await _controller.runJavaScriptReturningResult(functionName);
+      return result;
+    } catch (e, stack) {
+      APIService.writeLogError('callFunctionJSReturnData error ($functionName): $e\n$stack');
+      return null;
+    }
   }
 
   /// Send device information into webview.
   ///
   /// Return type [void]
   callFcGetDefaultLan() async {
-    var lan = await callFunctionJSReturnData("${Constants.JS_GET_DEFAULT_LAN}()");
-    var lanVoice = await callFunctionJSReturnData("${Constants.JS_GET_DEFAULT_LAN_VOICE}()");
-    lan = lan!.replaceAll('\"', '');
-    lanVoice = lanVoice!.replaceAll('\"', '');
-    CommonUtil.appUpdateLocale(lan);
-    await CommonUtil.saveSharedPreferences(Constants.SHARED_LANG, lan);
-    await CommonUtil.saveSharedPreferences(Constants.SHARED_LANG_VOICE, lanVoice);
+    try {
+      var lan = await callFunctionJSReturnData("${Constants.JS_GET_DEFAULT_LAN}()");
+      var lanVoice = await callFunctionJSReturnData("${Constants.JS_GET_DEFAULT_LAN_VOICE}()");
+      
+      if (lan != null && lan.toString().isNotEmpty) {
+        lan = lan.toString().replaceAll('\"', '');
+        CommonUtil.appUpdateLocale(lan as String);
+        await CommonUtil.saveSharedPreferences(Constants.SHARED_LANG, lan);
+      }
+      
+      if (lanVoice != null && lanVoice.toString().isNotEmpty) {
+        lanVoice = lanVoice.toString().replaceAll('\"', '');
+        await CommonUtil.saveSharedPreferences(Constants.SHARED_LANG_VOICE, lanVoice as String);
+      }
+    } catch (e, stack) {
+      APIService.writeLogError('callFcGetDefaultLan error: $e\n$stack');
+    }
   }
 
   /// Send device information into webview.
