@@ -6,14 +6,12 @@
 @implementation WKWebViewKeyboardHelperObjC
 
 + (void)enableKeyboardDisplayWithoutUserAction {
-    // WKContentView là private class bên trong WKWebView
     Class WKContentViewClass = NSClassFromString(@"WKContentView");
     if (!WKContentViewClass) {
         NSLog(@"[WKWebViewKeyboardHelper] Không tìm thấy WKContentView");
         return;
     }
     
-    // Danh sách các selector theo phiên bản iOS (mới nhất trước)
     // iOS 16.4+ (bao gồm iOS 17, 18)
     SEL sel_16_4 = NSSelectorFromString(@"_elementDidFocus:userIsInteracting:blurPreviousNode:activityStateChanges:userObject:");
     // iOS 13 - 16.3
@@ -35,30 +33,26 @@
         return;
     }
     
-    // Lấy IMP gốc
     IMP originalImp = method_getImplementation(method);
-    
-    // Tạo block thay thế — Objective-C dùng `id` (raw pointer)
-    // KHÔNG bị ARC retain/release như Swift AnyObject → không crash swift_unknownObjectRetain
-    //
-    // Signature: void (id self, id focusedElementInfo, BOOL userIsInteracting,
-    //                  BOOL blurPreviousNode, id activityStateChanges, id userObject)
-    //
-    // Lưu ý: imp_implementationWithBlock block KHÔNG có tham số _cmd (SEL),
-    // nhưng khi gọi lại originalImp thì cần truyền _cmd.
     SEL capturedSel = targetSel;
-    IMP capturedImp = originalImp;
     
-    id newBlock = ^(id _self, id arg0, BOOL userIsInteracting, BOOL arg2, id arg3, id arg4) {
-        // Gọi lại hàm gốc, luôn truyền userIsInteracting = YES
-        // Dùng function pointer cast để gọi IMP trực tiếp
-        ((void (*)(id, SEL, id, BOOL, BOOL, id, id))capturedImp)(_self, capturedSel, arg0, YES, arg2, arg3, arg4);
+    // FIX: Dùng void* cho TẤT CẢ tham số có thể không phải ObjC object
+    // __unsafe_unretained cho id để ARC KHÔNG retain/release
+    // void* cho activityStateChanges và userObject vì trên iOS 17/18
+    // Apple đã thay đổi kiểu nội bộ — không còn là ObjC object
+    id newBlock = ^void (__unsafe_unretained id _self,
+                         void *arg0,
+                         BOOL userIsInteracting,
+                         BOOL arg2,
+                         void *arg3,
+                         void *arg4) {
+        // Cast IMP thành function pointer thuần C — không qua ARC
+        typedef void (*OrigFn)(__unsafe_unretained id, SEL, void *, BOOL, BOOL, void *, void *);
+        ((OrigFn)originalImp)(_self, capturedSel, arg0, YES, arg2, arg3, arg4);
     };
     
-    IMP newImp = imp_implementationWithBlock(newBlock);
-    method_setImplementation(method, newImp);
-    
-    NSLog(@"[WKWebViewKeyboardHelper] Đã patch thành công cho selector: %@", NSStringFromSelector(targetSel));
+    method_setImplementation(method, imp_implementationWithBlock(newBlock));
+    NSLog(@"[WKWebViewKeyboardHelper] Patched: %@", NSStringFromSelector(targetSel));
 }
 
 @end
