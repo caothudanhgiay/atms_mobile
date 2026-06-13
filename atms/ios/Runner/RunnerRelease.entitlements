@@ -3,9 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>aps-environment</key>
-	<string>development</string>
-	<key>com.apple.developer.networking.networkextension</key>
-	<array/>
+	<string>production</string>
 	<key>com.apple.developer.networking.wifi-info</key>
 	<true/>
 </dict>
