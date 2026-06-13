@@ -15,7 +15,8 @@ import Flutter
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
         // Cho phép WKWebView hiện keyboard khi gọi focus() programmatically (không cần user gesture)
-        WKWebViewKeyboardHelper.enableKeyboardDisplayWithoutUserAction()
+        // Dùng bản Objective-C để tránh crash swift_unknownObjectRetain trên iOS 17/18
+        WKWebViewKeyboardHelperObjC.enableKeyboardDisplayWithoutUserAction()
         
         let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
         MethodChannel.instance.initChannel(messenger: controller.binaryMessenger)

@@ -536,16 +536,30 @@ class CustomWebViewState extends State<CustomWebView> with WidgetsBindingObserve
     String idTxtText = data['idTxtText'];
     String inputMode = _mapInputMode(type);
 
-    // Flutter set inputmode trên element trong iframe
-    // (đây là code Dart trong custom_webview.dart, KHÔNG sửa file JS)
-    // inputmode quyết định loại keyboard OS hiển thị khi element được focus
-    _controller.runJavaScript(
-      'try{document.getElementById("masterFrame").contentWindow.document.getElementById("$idTxtText").setAttribute("inputmode","$inputMode")}catch(e){}'
-    );
+    // JavaScript updated to use findControlById
+    String jsCode = """
+      (function() {
+        try {
+          if (typeof findControlById !== 'function') {
+            return "Error: findControlById function is not defined in JS scope";
+          }
+          
+          var element = findControlById("$idTxtText");
+          if (!element) {
+            return "Error: Element '$idTxtText' not found via findControlById";
+          }
+          
+          element.setAttribute("inputmode", "$inputMode");
+          return "Success: set inputmode to " + "$inputMode" + " for " + "$idTxtText" + " using findControlById";
+        } catch (e) {
+          return "JS Error: " + e.message;
+        }
+      })()
+    """;
+
+    final result = await _controller.runJavaScriptReturningResult(jsCode);
 
     // Focus WebView widget ở Flutter/native level TRƯỚC
-    // Điều này cho Android biết WebView đang active → cho phép keyboard hiện
-    // Trên iOS, WKWebViewKeyboardHelper đã xử lý
     _webViewFocusNode.requestFocus();
     await Future.delayed(const Duration(milliseconds: 100));
 

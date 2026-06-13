@@ -89,9 +89,5 @@
 	<true/>
 	<key>NSLocalNetworkUsageDescription</key>
     <string>Ứng dụng cần truy cập mạng để kết nối với thiết bị và gỡ lỗi.</string>
-    <key>NSBonjourServices</key>
-    <array>
-        <string>_dartobservatory._tcp</string>
-    </array>
 </dict>
 </plist>
