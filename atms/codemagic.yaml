@@ -35,13 +35,15 @@ workflows:
           cd atms
           flutter pub get
 
-      # Bước 2: Tăng build number tự động (BUILD_NUMBER tự tăng mỗi lần build)
-      - name: Set build number
+      # Bước 2: Set version và build number cố định
+      # ⚠️ Mỗi lần release mới, tăng BUILD_NUMBER lên (phải > bản trước trên App Store)
+      - name: Set version and build number
         script: |
           cd atms
-          CURRENT_VERSION=$(grep "^version:" pubspec.yaml | sed 's/version: //' | cut -d'+' -f1)
-          echo "Building version: $CURRENT_VERSION+$BUILD_NUMBER"
-          sed -i "s/^version: .*/version: $CURRENT_VERSION+$BUILD_NUMBER/" pubspec.yaml
+          APP_VERSION="2.6.1"   # Version hiển thị trên App Store
+          APP_BUILD="9"         # Build number (phải > 8 - bản cuối đã upload)
+          echo "Building version: $APP_VERSION+$APP_BUILD"
+          sed -i "s/^version: .*/version: $APP_VERSION+$APP_BUILD/" pubspec.yaml
 
       # Bước 3: Cài CocoaPods
       - name: Install CocoaPods dependencies
@@ -63,10 +65,13 @@ workflows:
       - name: Build IPA for App Store
         script: |
           cd atms
+          APP_VERSION="2.6.1"
+          APP_BUILD="9"
           flutter build ipa \
             --release \
             --export-method app-store \
-            --build-number=$BUILD_NUMBER
+            --build-name=$APP_VERSION \
+            --build-number=$APP_BUILD
 
     artifacts:
       - atms/build/ios/ipa/*.ipa
